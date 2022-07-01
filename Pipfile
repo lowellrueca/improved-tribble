@@ -8,6 +8,7 @@ uvicorn = "*"
 starlette = "*"
 tortoise-orm = "*"
 asyncpg = "*"
+orjson = "*"
 
 [dev-packages]
 mypy = "*"
