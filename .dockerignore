@@ -1,0 +1,31 @@
+# dot files
+*.env
+*.venv
+
+# git and cache folders
+.git
+.gitignore
+.cache
+
+# ignore all markdown files
+*.md
+
+# docker
+.dockerignore
+*.yml
+Dockerfile
+
+# python
+.mypy_cache
+*.lock
+Pipfile
+
+# others
+*.toml
+/aerich
+/logs
+/migrations
+/scratch
+
+LICENSE
+Makefile
