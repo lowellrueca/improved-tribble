@@ -1,0 +1,32 @@
+version: "3.9"
+services:
+  api:
+    container_name: pctec_api
+    image: python:3.10-alpine
+    build: .
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - ./.env
+  db:
+    container_name: pctec_db
+    image: postgres:14-alpine
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=${DB_USER:-user}
+      - POSTGRES_PASSWORD=${DB_PSWD:-pswd}
+      - POSTGRES_DB=${DB_NAME:-db}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 30s
+      retries: 5
+volumes:
+  pgdata: {}
