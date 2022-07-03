@@ -9,6 +9,7 @@ starlette = "*"
 tortoise-orm = "*"
 asyncpg = "*"
 orjson = "*"
+pydantic = "*"
 
 [dev-packages]
 mypy = "*"
