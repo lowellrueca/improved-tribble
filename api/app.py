@@ -6,9 +6,9 @@ from starlette.routing import Mount
 
 def create_app():
     # imports
-    from api.settings import DEBUG
-    from api.routes import product_routes
-    from api.events import on_startup, on_shutdown
+    from .settings import DEBUG
+    from .routes import product_routes
+    from .events import on_startup, on_shutdown
 
     # routes
     routes = [

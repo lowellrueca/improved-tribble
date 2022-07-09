@@ -12,7 +12,6 @@ class AbstractModel(Model):
 
 
 class Product(AbstractModel):
-    """ Db model for products """
     name = CharField(max_length=128, nullable=False)
     price = DecimalField(max_digits=8, decimal_places=2)
 
