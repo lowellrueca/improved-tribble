@@ -20,4 +20,4 @@ if __name__ == '__main__':
         run_app()
 
     except Exception:
-        logging.exception("An error occured while running the app")
+        logger.exception("An error occured while running the app")
