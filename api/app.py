@@ -11,10 +11,11 @@ def create_app():
     from .routes import product_routes
     from .events import on_startup, on_shutdown
     from .middlewares import DataValidationMiddleware
+    from .db import __models__ as models
 
     # middlewares
     middlewares = [
-        Middleware(DataValidationMiddleware)
+        Middleware(DataValidationMiddleware, models=models)
     ]
 
     # routes
