@@ -46,6 +46,26 @@ def use_repository(model:Type[Model]):
     def func_wrap(f):
         async def fn(*args, **kwargs):
             request = args[0]
-            return await f(repository=Repository(model=model, request=request), *args, **kwargs)
+            repository = Repository(model=model, request=request)
+
+            # validate data model against the orm model table
+            # on post or patch method
+            if request.method == "POST" or request.method == "PATCH":
+                model_table: str = getattr(model.Meta, "table")
+                data_model: DataModel = request.state.data_model            
+
+                try:
+                    assert model_table == data_model.type
+                    return await f(repository=repository, 
+                        data_model=data_model, *args, **kwargs)
+
+                except AssertionError as err:
+                    logger.exception(err)
+                    raise HTTPException(status_code=404, 
+                        detail="Assertion error occured: type of {type} against type of {table}"
+                        .format(type=data_model.type, table=model_table))
+
+            return await f(repository=repository, *args, **kwargs)
+
         return fn
     return func_wrap
