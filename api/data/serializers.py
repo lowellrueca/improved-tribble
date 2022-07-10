@@ -10,6 +10,8 @@ from .encoder import model_encoder
 
 set_url: Callable[[URL], str] = lambda url: f"{url.scheme}://{url.hostname}:{url.port}{url.path}"
 
+set_link: Callable[[Model, URL], str] = lambda model, url: f"{set_url(url)}{getattr(model, 'id')}"
+
 get_table_attr: Callable[[Model], str] = lambda model: getattr(
     cast(Model, model).Meta, "table")
 
