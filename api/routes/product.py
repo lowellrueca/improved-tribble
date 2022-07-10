@@ -9,7 +9,7 @@ from tortoise.exceptions import DoesNotExist, IntegrityError, ValidationError
 from tortoise.models import Model
 from tortoise.queryset import QuerySet
 
-from ..data import Repository, use_repository
+from ..data import DataModel, Repository, use_repository
 from ..db import Product
 
 logger = logging.getLogger("root")
