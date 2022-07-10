@@ -44,6 +44,10 @@ class Repository:
         return await self.serializer.serialize_query_set_single(
             query_set_single=query_set_single, url=self._url)
 
+    async def serialize_model(self, model: Model) -> Dict[str, Any]:
+        return await self.serializer.serialize_model(
+            model=model, url=self._url)
+
 
 def use_repository(model:Type[Model]):
     def func_wrap(f):
