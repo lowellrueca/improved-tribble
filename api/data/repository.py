@@ -25,6 +25,9 @@ class Repository:
     async def get(self, param:dict) -> QuerySetSingle:
         return self._model.get(**param)
 
+    async def create(self, params: dict) -> Model:
+        return await self._model.create(**params)
+
     async def serialize_query_set(
             self, 
             query_set: QuerySet
