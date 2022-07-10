@@ -48,8 +48,31 @@ async def get_by_id(
 
     return JSONResponse(content=content)
 
+@use_repository(model=Product)
+async def create_product(
+        request: Request, 
+        repository: Repository, 
+        data_model: Optional[DataModel]
+    ) -> JSONResponse:
+
+    try:
+        attrs: Dict[str, Any] = data_model.attributes
+        model: Model | Product = await repository.create(params=attrs)
+        result: Dict[str, Any] = await repository.serialize_model(model=model)
+    
+    except (IntegrityError, ValidationError) as err:
+        if isinstance(err, IntegrityError):
+            err_args = getattr(err, "args")[0]
+            detail = getattr(err_args, "args")[0] 
+            raise HTTPException(status_code=422, detail=detail)
+
+        err_args = getattr(err, "args")[0]
+        raise HTTPException(status_code=422, detail=f"{err_args}")
+
+    return JSONResponse(content=result, status_code=201)
 
 routes = [
     Route(path="/", endpoint=get_products, methods=["GET"]),
+    Route(path="/", endpoint=create_product, methods=["POST"]),
     Route(path="/{id:uuid}", endpoint=get_by_id, methods=["GET"])
 ]
