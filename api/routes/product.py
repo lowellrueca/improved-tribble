@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 from starlette.exceptions import HTTPException
 from starlette.requests import Request
@@ -52,7 +52,7 @@ async def get_by_id(
 async def create_product(
         request: Request, 
         repository: Repository, 
-        data_model: Optional[DataModel]
+        data_model: DataModel
     ) -> JSONResponse:
 
     try:
