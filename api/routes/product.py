@@ -1,6 +1,7 @@
 import logging
 from typing import Any, Dict, List, Optional
 
+from starlette.exceptions import HTTPException
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 from starlette.routing import Route
