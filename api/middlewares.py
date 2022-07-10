@@ -26,10 +26,22 @@ class DataValidationMiddleware(BaseHTTPMiddleware):
 
         if request.method == "POST" or request.method == "PATCH":
             try:
+                # retrieve the models table
+                model_tables = tuple(map(
+                    lambda m: getattr(m.Meta, "table"), self._models))
+
+                # retrieve the payload
                 json_data = await request.json()
                 data = json_data["data"]
+
+                # validate the type from payload against the model tables
+                if not data["type"] in model_tables:
+                    return Response(
+                        content=f"Type of {data['type']} not in the database", 
+                        status_code=404)
+
                 request.state.data_model = DataModel(
-                        type=data["type"], attributes=data["attributes"])
+                    type=data["type"], attributes=data["attributes"])
 
             except KeyError as err:
                 logger.exception(err)
