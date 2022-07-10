@@ -38,13 +38,13 @@ class DataValidationMiddleware(BaseHTTPMiddleware):
                 if not data["type"] in model_tables:
                     return Response(
                         content=f"Type of {data['type']} not in the database", 
-                        status_code=404)
+                        status_code=400)
 
                 request.state.data_model = DataModel(
                     type=data["type"], attributes=data["attributes"])
 
             except KeyError as err:
                 logger.exception(err)
-                return Response(content=f"KeyError: {err}", status_code=404)
+                return Response(content=f"KeyError: {err}", status_code=400)
 
         return await call_next(request)
