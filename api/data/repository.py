@@ -54,22 +54,14 @@ def use_repository(model:Type[Model]):
             request = args[0]
             repository = Repository(model=model, request=request)
 
-            # validate data model against the orm model table
-            # on post or patch method
+            # retrieve DataModel class from DataValidationMiddleware
             if request.method == "POST" or request.method == "PATCH":
-                model_table: str = getattr(model.Meta, "table")
-                data_model: DataModel = request.state.data_model            
-
-                try:
-                    assert model_table == data_model.type
-                    return await f(repository=repository, 
-                        data_model=data_model, *args, **kwargs)
-
-                except AssertionError as err:
-                    logger.exception(err)
-                    raise HTTPException(status_code=404, 
-                        detail="Assertion error occured: type of {type} against type of {table}"
-                        .format(type=data_model.type, table=model_table))
+                if data_model := request.state.data_model:
+                    logger.debug(f"data model: {data_model}")
+                    return await f(
+                        repository=repository, 
+                        data_model=data_model,
+                        *args, **kwargs)
 
             return await f(repository=repository, *args, **kwargs)
 
