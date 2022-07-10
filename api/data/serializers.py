@@ -29,11 +29,10 @@ class QuerySerializer:
         url: URL
     ) -> List[Dict[str, Any]]:
 
-        set_link: Callable[[Model], str] = lambda m: f"{set_url(url)}{getattr(m, 'id')}"
         models: List[Model] = await query_set
         result: List[Dict[str, Any]] = [{
                 **to_json_model(model),
-                "link": {"self": set_link(model)}}
+                "link": {"self": set_link(model, url)}}
             for model in models]
 
         return result
