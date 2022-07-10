@@ -1,3 +1,4 @@
+import logging
 from typing import Any, Dict, List, Type
 
 from starlette.requests import Request
@@ -5,6 +6,8 @@ from tortoise.models import Model
 from tortoise.queryset import QuerySet, QuerySetSingle
 
 from .serializers import QuerySerializer
+
+logger: logging.Logger = logging.getLogger("root")
 
 
 class Repository:
