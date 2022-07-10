@@ -1,10 +1,13 @@
 import logging
+from typing import List, Optional, Type
 
 from starlette.middleware.base import (
-        BaseHTTPMiddleware, RequestResponseEndpoint)
+        BaseHTTPMiddleware, DispatchFunction, RequestResponseEndpoint)
 
 from starlette.requests import Request
 from starlette.responses import Response
+from starlette.types import ASGIApp
+from tortoise.models import Model
 
 from .data import DataModel
 
@@ -12,6 +15,10 @@ logger: logging.Logger = logging.getLogger("root")
 
 
 class DataValidationMiddleware(BaseHTTPMiddleware):
+    def __init__(self, app: ASGIApp, models: List[Type[Model]], dispatch: Optional[DispatchFunction] = None) -> None:
+        super().__init__(app, dispatch)
+        self._models = models
+
     async def dispatch(
         self, request: Request, 
         call_next: RequestResponseEndpoint
