@@ -5,9 +5,9 @@ from starlette.exceptions import HTTPException
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 from starlette.routing import Route
-from starlette.exceptions import HTTPException
+from tortoise.exceptions import DoesNotExist, IntegrityError, ValidationError
+from tortoise.models import Model
 from tortoise.queryset import QuerySet
-from tortoise.exceptions import DoesNotExist
 
 from ..data import Repository, use_repository
 from ..db import Product
