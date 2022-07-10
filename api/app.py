@@ -2,6 +2,7 @@
 
 from starlette.applications import Starlette as App
 from starlette.routing import Mount
+from starlette.middleware import Middleware
 
 
 def create_app():
@@ -9,6 +10,12 @@ def create_app():
     from .settings import DEBUG
     from .routes import product_routes
     from .events import on_startup, on_shutdown
+    from .middlewares import DataValidationMiddleware
+
+    # middlewares
+    middlewares = [
+        Middleware(DataValidationMiddleware)
+    ]
 
     # routes
     routes = [
@@ -18,6 +25,7 @@ def create_app():
     # init app
     app: App = App(
         debug=DEBUG, routes=routes, 
+        middleware=middlewares,
         on_startup=[on_startup], 
         on_shutdown=[on_shutdown]
     )
