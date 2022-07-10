@@ -49,3 +49,7 @@ class QuerySerializer:
             "link":{"self": set_url(url)}}
 
         return result
+
+    @staticmethod
+    async def serialize_model(model: Model, url: URL) -> Dict[str, Any]:
+        return {**to_json_model(model), "link":{"self": set_link(model, url)}}
