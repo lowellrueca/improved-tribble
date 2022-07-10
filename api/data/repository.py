@@ -2,11 +2,9 @@ import logging
 from typing import Any, Dict, List, Type
 
 from starlette.requests import Request
-from starlette.exceptions import HTTPException
 from tortoise.models import Model
 from tortoise.queryset import QuerySet, QuerySetSingle
 
-from .models import DataModel
 from .serializers import QuerySerializer
 
 logger: logging.Logger = logging.getLogger("root")
