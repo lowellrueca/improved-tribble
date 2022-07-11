@@ -53,15 +53,6 @@ def use_repository(model:Type[Model]):
         async def fn(*args, **kwargs):
             request = args[0]
             repository = Repository(model=model, request=request)
-
-            # retrieve DataModel class from DataValidationMiddleware
-            if request.method == "POST" or request.method == "PATCH":
-                if data_model := request.state.data_model:
-                    return await f(
-                        repository=repository, 
-                        data_model=data_model,
-                        *args, **kwargs)
-
             return await f(repository=repository, *args, **kwargs)
 
         return fn
