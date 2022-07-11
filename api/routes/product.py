@@ -50,16 +50,16 @@ async def get_by_id(
 
     return JSONResponse(content=content)
 
+@validate_data(attribute_model=ProductAttributeModel)
 @use_repository(model=Product)
 async def create_product(
         request: Request, 
         repository: Repository, 
-        data_model: DataModel
+        params: Dict[str, Any]
     ) -> JSONResponse:
 
     try:
-        attrs: Dict[str, Any] = data_model.attributes
-        model: Model | Product = await repository.create(params=attrs)
+        model: Model | Product = await repository.create(params=params)
         result: Dict[str, Any] = await repository.serialize_model(model=model)
     
     except (IntegrityError, ValidationError) as err:
