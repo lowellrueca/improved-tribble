@@ -71,8 +71,28 @@ async def create_product(
 
     return JSONResponse(content=result, status_code=201)
 
+@validate_data(attribute_model=ProductAttributeModel)
+@use_repository(model=Product)
+async def update_product(
+    request: Request, 
+    repository:Repository, 
+    params: Dict[str, Any]
+    ) -> Response:
+
+    try:
+        id: UUID = request.path_params["id"]
+        model: Model | Product = await repository.update(id=id, params=params)
+        result:  Dict[str, Any] = await repository.serialize_model(model=model)
+
+    except DoesNotExist as err:
+        logger.exception(err)
+        raise HTTPException(status_code=404, detail=str(err))
+
+    return JSONResponse(content=result, status_code=200)
+
 routes = [
     Route(path="/", endpoint=get_products, methods=["GET"]),
     Route(path="/", endpoint=create_product, methods=["POST"]),
-    Route(path="/{id:uuid}", endpoint=get_by_id, methods=["GET"])
+    Route(path="/{id:uuid}", endpoint=get_by_id, methods=["GET"]),
+    Route(path="/{id:uuid}", endpoint=update_product, methods=["PATCH"])
 ]
