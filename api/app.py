@@ -20,7 +20,7 @@ def create_app():
 
     # routes
     routes = [
-        Mount(path="/api/products/", routes=product_routes),
+        Mount(path="/api/products", routes=product_routes),
     ]
 
     # init app
