@@ -1,15 +1,17 @@
 import logging
 from typing import Any, Dict, List
+from uuid import UUID
 
 from starlette.exceptions import HTTPException
 from starlette.requests import Request
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, Response
 from starlette.routing import Route
 from tortoise.exceptions import DoesNotExist, IntegrityError, ValidationError
 from tortoise.models import Model
 from tortoise.queryset import QuerySet
 
-from ..data import DataModel, Repository, use_repository
+from ..data import ProductAttributeModel, Repository
+from ..data import use_repository, validate_data
 from ..db import Product
 
 logger = logging.getLogger("root")
