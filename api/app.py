@@ -1,5 +1,3 @@
-""" Contains startup function for creating the application """
-
 from starlette.applications import Starlette as App
 from starlette.routing import Mount
 from starlette.middleware import Middleware
