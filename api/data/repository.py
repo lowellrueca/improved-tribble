@@ -1,4 +1,5 @@
 import logging
+from uuid import UUID
 from typing import Any, Dict, List, Type
 
 from starlette.requests import Request
@@ -26,6 +27,12 @@ class Repository:
 
     async def create(self, params: dict) -> Model:
         return await self._model.create(**params)
+
+    async def update(self, id: int | UUID, params: dict) -> Model:
+        model = await self._model.get(id=id)
+        await model.update_from_dict(data=params)
+        await model.save()
+        return model
 
     async def serialize_query_set(
             self, 
