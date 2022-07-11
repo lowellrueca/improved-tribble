@@ -45,6 +45,8 @@ class DataValidationMiddleware(BaseHTTPMiddleware):
 
             except KeyError as err:
                 logger.exception(err)
-                return Response(content=f"KeyError: {err}", status_code=400)
+                return Response(
+                    content=f"Bad request: Missing/Invalid input for key {err}", 
+                    status_code=400)
 
         return await call_next(request)
