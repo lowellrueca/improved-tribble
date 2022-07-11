@@ -15,7 +15,12 @@ logger: logging.Logger = logging.getLogger("root")
 
 
 class DataValidationMiddleware(BaseHTTPMiddleware):
-    def __init__(self, app: ASGIApp, models: List[Type[Model]], dispatch: Optional[DispatchFunction] = None) -> None:
+    def __init__(
+        self, app: ASGIApp, 
+        models: List[Type[Model]], 
+        dispatch: Optional[DispatchFunction] = None
+    ) -> None:
+
         super().__init__(app, dispatch)
         self._models = models
 
