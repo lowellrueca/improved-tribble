@@ -34,6 +34,10 @@ class Repository:
         await model.save()
         return model
 
+    async def delete(self, id: int | UUID) -> None:
+        model: Model = await self._model.get(id=id)
+        await model.delete()
+
     async def serialize_query_set(
             self, 
             query_set: QuerySet
