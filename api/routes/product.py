@@ -92,9 +92,23 @@ async def update_product(
 
     return JSONResponse(content=result, status_code=200)
 
+@use_repository(model=Product)
+async def delete_product(request: Request, repository: Repository) -> Response:
+    try:
+        id: UUID = request.path_params["id"]
+        await repository.delete(id)
+    
+    except DoesNotExist as err:
+        logger.exception(err)
+        raise HTTPException(status_code=404, detail=str(err))
+
+    return Response(status_code=204)
+
+
 routes = [
     Route(path="/", endpoint=get_products, methods=["GET"]),
     Route(path="/", endpoint=create_product, methods=["POST"]),
     Route(path="/{id:uuid}", endpoint=get_by_id, methods=["GET"]),
-    Route(path="/{id:uuid}", endpoint=update_product, methods=["PATCH"])
+    Route(path="/{id:uuid}", endpoint=update_product, methods=["PATCH"]),
+    Route(path="/{id:uuid}", endpoint=delete_product, methods=["DELETE"])
 ]
