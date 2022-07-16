@@ -11,9 +11,14 @@ def create_app():
     from .settings import DEBUG
     from .routes import product_routes
     from .events import on_startup, on_shutdown
+    from .middlewares import RepositoriesMiddleware
+    from .data import ProductRepository
+
+    repositories = [ProductRepository]
 
     # middlewares
     middlewares = [
+        Middleware(RepositoriesMiddleware, repositories=repositories)
     ]
 
     # routes
