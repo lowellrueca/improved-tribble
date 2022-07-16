@@ -1,6 +1,9 @@
+import logging
 from starlette.applications import Starlette as App
 from starlette.routing import Mount
 from starlette.middleware import Middleware
+
+logger: logging.Logger = logging.getLogger("root")
 
 
 def create_app():
