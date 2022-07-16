@@ -2,56 +2,40 @@ import logging
 from typing import List, Optional, Type
 
 from starlette.middleware.base import (
-        BaseHTTPMiddleware, DispatchFunction, RequestResponseEndpoint)
-
+    BaseHTTPMiddleware,
+    DispatchFunction,
+    RequestResponseEndpoint,
+)
 from starlette.requests import Request
 from starlette.responses import Response
 from starlette.types import ASGIApp
-from tortoise.models import Model
 
-from .data import DataModel
+from .data import BaseRepository
 
 logger: logging.Logger = logging.getLogger("root")
 
 
-class DataValidationMiddleware(BaseHTTPMiddleware):
+class RepositoriesMiddleware(BaseHTTPMiddleware):
     def __init__(
-        self, app: ASGIApp, 
-        models: List[Type[Model]], 
+        self, 
+        app: ASGIApp, 
+        repositories: List[Type[BaseRepository]], 
         dispatch: Optional[DispatchFunction] = None
     ) -> None:
 
-        super().__init__(app, dispatch)
-        self._models = models
+        super().__init__(app=app, dispatch=dispatch)
+        self._repositories = tuple(repositories)
 
     async def dispatch(
-        self, request: Request, 
+        self, 
+        request: Request, 
         call_next: RequestResponseEndpoint
     ) -> Response:
 
-        if request.method == "POST" or request.method == "PATCH":
-            try:
-                # retrieve the models table
-                model_tables = tuple(map(
-                    lambda m: getattr(m.Meta, "table"), self._models))
-
-                # retrieve the payload
-                json_data = await request.json()
-                data = json_data["data"]
-
-                # validate the type from payload against the model tables
-                if not data["type"] in model_tables:
-                    return Response(
-                        content=f"Type of {data['type']} not in the database", 
-                        status_code=400)
-
-                request.state.data_model = DataModel(
-                    type=data["type"], attributes=data["attributes"])
-
-            except KeyError as err:
-                logger.exception(err)
-                return Response(
-                    content=f"Bad request: Missing/Invalid input for key {err}", 
-                    status_code=400)
+        try:
+            request.state.repositories = self._repositories
+            
+        except Exception as err:
+            logger.exception(str(err))
 
         return await call_next(request)
