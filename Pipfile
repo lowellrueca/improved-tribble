@@ -9,7 +9,7 @@ starlette = "*"
 tortoise-orm = "*"
 asyncpg = "*"
 orjson = "*"
-pydantic = "*"
+marshmallow-jsonapi = "*"
 
 [dev-packages]
 mypy = "*"
