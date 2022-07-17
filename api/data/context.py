@@ -3,6 +3,7 @@ from typing import List, NamedTuple, Optional, Type, cast
 
 from marshmallow.exceptions import ValidationError
 from marshmallow_jsonapi import Schema
+from marshmallow_jsonapi.exceptions import IncorrectTypeError
 from starlette.exceptions import HTTPException
 from starlette.middleware.base import (
     BaseHTTPMiddleware,
@@ -61,40 +62,39 @@ def context(name:str):
             repo: Type[BaseRepository] = context.repository
             schema: Type[Schema] = context.schema
 
-            # for validating payload
+            # to validate payload on post or on patch endpoints
             try:
                 if request.method == "POST" or request.method == "PATCH":
                     payload = await request.json()
                     schema().load(payload)
                     data = payload["data"]["attributes"]
-                    
-                    # return function
+
                     return await f(repository=repo(), schema=schema, data=data, 
                         *args, **kwargs)
 
-            # handle exception for payload errors
-            except Exception as exc:
-                if isinstance(exc, KeyError):
-                    detail = f"Invalid input. expected key {exc}"
+            # to handle exceptions occured for the payload errors
+            except ValidationError as exc:
+                if exc_schema := exc.args[0].get("_schema"):
+                    detail = exc_schema[0].get("detail")
                     logger.exception(msg=detail)
-                    raise HTTPException(status_code=422, detail=detail)
+                    raise HTTPException(status_code=400, detail=detail)
 
-                if isinstance(exc, ValidationError):
-                    if arg_schema := exc.args[0].get("_schema"):
-                        detail = arg_schema[0]["detail"]
-                        logger.exception(msg=detail)
-                        raise HTTPException(status_code=422, detail=detail)
-    
-                    detail = f"An exception occured: {exc.args[0]}"
-                    logger.debug(type(detail))
-                    raise HTTPException(status_code=422, detail=detail)
+                logger.exception(msg=f"An exception occured. {exc}")
+                raise HTTPException(status_code=400, detail=str(exc))
 
-                detail = f"An exception occured: {exc}"
+            except IncorrectTypeError as exc:
+                detail = f"An exception occured {exc}"
                 logger.exception(msg=detail)
-                raise HTTPException(status_code=422, detail=detail)
+                raise HTTPException(status_code=400, detail=detail)
+            
+            except KeyError as exc:
+                detail = f"Invalid input. Expected key {exc}"
+                logger.exception(msg=detail)
+                raise HTTPException(status_code=400, detail=detail)
 
-            # return function
-            return await f(repository=repo(), schema=schema, *args, **kwargs)
+            return await f(
+                repository=repo(), schema=schema, *args, **kwargs
+            )
 
         return fn
     return func_wrap
