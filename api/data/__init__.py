@@ -1,5 +1,14 @@
-from .repository import BaseRepository, ProductRepository, use_repository
+from .context import ContextService, ContextServiceMiddleware, context
+from .repository import RepositoryProtocol, BaseRepository, ProductRepository
 from .schemas import ProductSchema
 
 
-__all__ = ["ProductSchema", "BaseRepository", "ProductRepository", "use_repository"]
+__all__ = [
+    "BaseRepository", 
+    "ContextServiceMiddleware", 
+    "ContextService", 
+    "ProductRepository", 
+    "ProductSchema", 
+    "RepositoryProtocol", 
+    "context"
+]

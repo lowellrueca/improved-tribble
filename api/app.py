@@ -1,24 +1,32 @@
 import logging
+from typing import List
+
 from starlette.applications import Starlette as App
-from starlette.routing import Mount
 from starlette.middleware import Middleware
+from starlette.routing import Mount
 
 logger: logging.Logger = logging.getLogger("root")
 
 
 def create_app():
     # imports
+    from .data import (
+        ContextService, 
+        ContextServiceMiddleware, 
+        ProductRepository,
+        ProductSchema
+    )
     from .settings import DEBUG
     from .routes import product_routes
     from .events import on_startup, on_shutdown
-    from .middlewares import RepositoriesMiddleware
-    from .data import ProductRepository
 
-    repositories = [ProductRepository]
+    contexts: List[ContextService] = [
+        ContextService("product", ProductRepository, ProductSchema)
+    ]
 
     # middlewares
-    middlewares = [
-        Middleware(RepositoriesMiddleware, repositories=repositories)
+    middlewares: List[Middleware] = [
+        Middleware(ContextServiceMiddleware, contexts=contexts)
     ]
 
     # routes
@@ -27,11 +35,9 @@ def create_app():
     ]
 
     # init app
-    app: App = App(
+    return App(
         debug=DEBUG, routes=routes, 
         middleware=middlewares,
         on_startup=[on_startup], 
         on_shutdown=[on_shutdown]
     )
-
-    return app

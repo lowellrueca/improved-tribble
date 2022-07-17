@@ -1,7 +1,8 @@
 import logging
-from typing import List
+from typing import Any, Dict, List, Optional, Type
 from uuid import UUID
 
+from marshmallow_jsonapi.schema import Schema
 from starlette.exceptions import HTTPException
 from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
@@ -9,102 +10,105 @@ from starlette.routing import Route
 from tortoise.exceptions import DoesNotExist
 from tortoise.models import Model
 
-from ..data import ProductRepository, ProductSchema
-from ..data import use_repository
-from ..db import Product
+from ..data import RepositoryProtocol, context
 
 logger = logging.getLogger("root")
 
 
-@use_repository(repository=ProductRepository)
+@context(name="product")
 async def get_products(
         request: Request, 
-        repository: ProductRepository
+        repository: RepositoryProtocol,
+        schema: Type[Schema]
     ) -> JSONResponse:
 
     global content
     try:
-        models: List[Product] = await repository.all()
-        content = ProductSchema().dump(obj=models, many=True)
+        models: List[Type[Model]] = await repository.all()
+        content = schema().dump(obj=models, many=True)
     
-    except Exception as err:
-        logger.exception(err.args)
+    except Exception as exc:
+        logger.exception(exc.args)
 
     return JSONResponse(content=content)
 
-@use_repository(repository=ProductRepository)
+@context(name="product")
 async def get_product_by_id(
         request: Request, 
-        repository: ProductRepository
+        repository: RepositoryProtocol,
+        schema: Type[Schema]
     ) -> JSONResponse:
 
     global content
     try:
-        model = await repository.get(params=request.path_params)
-        content = ProductSchema().dump(obj=model)
+        model: Type[Model] = await repository.get(params=request.path_params)
+        content = schema().dump(model)
 
-    except Exception as err:
-        if isinstance(err, DoesNotExist):
+    except Exception as exc:
+        if isinstance(exc, DoesNotExist):
+            logger.exception(msg=str(exc))
             raise HTTPException(status_code=404, detail="Product does not exist")
 
-        logger.exception(err)
+        logger.exception(str(exc.args))
 
     return JSONResponse(content=content)
 
-@use_repository(repository=ProductRepository)
+@context(name="product")
 async def create_product(
         request: Request, 
-        repository: ProductRepository, 
+        repository: RepositoryProtocol,
+        schema: Type[Schema],
+        data: Dict[str, Any]
     ) -> JSONResponse:
 
+    global content
     try:
-        payload = await request.json()
-        schema: ProductSchema = ProductSchema()
-        schema.load(payload)
-        params = payload["data"]["attributes"]
-
-        model: Model | Product = await repository.create(params=params)
-        content = schema.dump(obj=model)
+        model: Type[Model] = await repository.create(params=data)
+        content = schema().dump(obj=model)
     
-    except Exception as err:
-        logger.exception(msg=err)
-        raise HTTPException(status_code=422, detail=str(err))
+    except Exception as exc:
+        logger.exception(msg=exc)
+        raise HTTPException(status_code=400, detail=f"An unexpected exception occured. '{exc}'")
 
-    return JSONResponse(content=content, status_code=201)
+    return JSONResponse(content=content)
 
-@use_repository(repository=ProductRepository)
+@context(name="product")
 async def update_product(
     request: Request, 
-    repository: ProductRepository, 
+    repository: RepositoryProtocol,
+    schema: Type[Schema],
+    data: Dict[str, Any]
+    ) -> Response:
+
+    global content
+    try:
+        id: UUID = request.path_params["id"]
+        model: Type[Model] = await repository.update(id=id, params=data)
+        content = schema().dump(obj=model)
+
+    except Exception as exc:
+        logger.exception(exc.args)
+
+    return JSONResponse(content=content)
+
+@context(name="product")
+async def delete_product(
+        request: Request, 
+        repository: RepositoryProtocol,
+        schema: Optional[Type[Schema]]
     ) -> Response:
 
     try:
+        logger.debug(msg="debugging delete_product endpoint")
         id: UUID = request.path_params["id"]
-        payload = await request.json()
-        schema = ProductSchema()
-        schema.load(payload)
-        params = payload["data"]["attributes"]
-
-        model: Model | Product = await repository.update(id=id, params=params)
-        content = schema.dump(obj=model)
-
-    except Exception as err:
-        if isinstance(err, DoesNotExist):
-            raise HTTPException(status_code=404, detail="Product does not exists")
-        logger.exception(err.args)
-        raise HTTPException(status_code=404, detail=str(err.args))
-
-    return JSONResponse(content=content, status_code=200)
-
-@use_repository(repository=ProductRepository)
-async def delete_product(request: Request, repository: ProductRepository) -> Response:
-    try:
-        id: UUID = request.path_params["id"]
-        await repository.delete(id)
+        await repository.delete(id=id)
     
-    except DoesNotExist as err:
-        logger.exception(err)
-        raise HTTPException(status_code=404, detail="Product does not exist")
+    except Exception as exc:
+        if isinstance(exc, DoesNotExist):
+            logger.exception(msg=str(exc))
+            raise HTTPException(status_code=404, detail="Product does not exist")
+
+        logger.exception(str(exc.args))
 
     return Response(status_code=204)
 
