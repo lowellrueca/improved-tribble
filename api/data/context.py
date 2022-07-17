@@ -72,7 +72,7 @@ def context(name:str):
                     return await f(repository=repo(), schema=schema, data=data, 
                         *args, **kwargs)
 
-            # handle exception for payload excors
+            # handle exception for payload errors
             except Exception as exc:
                 if isinstance(exc, KeyError):
                     detail = f"Invalid input. expected key {exc}"
