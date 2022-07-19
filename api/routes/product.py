@@ -29,6 +29,7 @@ async def get_products(
     
     except Exception as exc:
         logger.exception(exc.args)
+        raise HTTPException(status_code=500, detail=f"An unexpected error occured. {exc}")
 
     return JSONResponse(content=content)
 
