@@ -72,6 +72,9 @@ def context(name:str):
                     return await f(repository=repo(), schema=schema, data=data, 
                         *args, **kwargs)
 
+                if request.method == "DELETE":
+                    return await f(repository=repo(), *args, **kwargs)
+
             # to handle exceptions occured for the payload errors
             except ValidationError as exc:
                 if exc_schema := exc.args[0].get("_schema"):

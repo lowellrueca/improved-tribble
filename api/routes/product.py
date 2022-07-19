@@ -94,7 +94,6 @@ async def update_product(
 async def delete_product(
         request: Request, 
         repository: RepositoryProtocol,
-        schema: Optional[Type[Schema]]
     ) -> Response:
 
     try:
