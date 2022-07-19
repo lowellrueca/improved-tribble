@@ -45,12 +45,9 @@ async def get_product_by_id(
         model: Type[Model] = await repository.get(params=request.path_params)
         content = schema().dump(model)
 
-    except Exception as exc:
-        if isinstance(exc, DoesNotExist):
-            logger.exception(msg=str(exc))
-            raise HTTPException(status_code=404, detail="Product does not exist")
-
-        logger.exception(str(exc.args))
+    except DoesNotExist as exc:
+        logger.exception(msg=str(exc))
+        raise HTTPException(status_code=404, detail="Product does not exist")
 
     return JSONResponse(content=content)
 
