@@ -7,7 +7,7 @@ from starlette.exceptions import HTTPException
 from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
 from starlette.routing import Route
-from tortoise.exceptions import DoesNotExist
+from tortoise.exceptions import DoesNotExist, ValidationError
 from tortoise.models import Model
 
 from ..data import RepositoryProtocol, context
@@ -64,7 +64,7 @@ async def create_product(
         model: Type[Model] = await repository.create(params=data)
         content = schema().dump(obj=model)
     
-    except Exception as exc:
+    except ValidationError as exc:
         logger.exception(msg=exc)
         raise HTTPException(status_code=400, detail=f"An unexpected exception occured. '{exc}'")
 
