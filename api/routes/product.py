@@ -84,8 +84,9 @@ async def update_product(
         model: Type[Model] = await repository.update(id=id, params=data)
         content = schema().dump(obj=model)
 
-    except Exception as exc:
+    except DoesNotExist as exc:
         logger.exception(exc.args)
+        raise HTTPException(status_code=404, detail="Product does not exist")
 
     return JSONResponse(content=content)
 
@@ -101,12 +102,9 @@ async def delete_product(
         id: UUID = request.path_params["id"]
         await repository.delete(id=id)
     
-    except Exception as exc:
-        if isinstance(exc, DoesNotExist):
-            logger.exception(msg=str(exc))
-            raise HTTPException(status_code=404, detail="Product does not exist")
-
-        logger.exception(str(exc.args))
+    except DoesNotExist as exc:
+        logger.exception(msg=str(exc))
+        raise HTTPException(status_code=404, detail="Product does not exist")
 
     return Response(status_code=204)
 
