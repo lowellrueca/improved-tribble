@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict, List, Optional, Type
+from typing import Any, Dict, List, Type
 from uuid import UUID
 
 from marshmallow_jsonapi.schema import Schema
