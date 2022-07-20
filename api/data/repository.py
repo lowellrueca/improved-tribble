@@ -6,7 +6,7 @@ from tortoise.models import Model
 
 from ..db import Product
 
-logger: logging.Logger = logging.getLogger("root")
+logger: logging.Logger = logging.getLogger("uvicorn.error")
 
 
 T = TypeVar("T")

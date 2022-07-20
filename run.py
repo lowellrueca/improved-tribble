@@ -2,8 +2,7 @@ import logging
 import logging.config
 from uvicorn import run
 
-logging.config.fileConfig(fname="logging.conf")
-logger = logging.getLogger("root")
+logger = logging.getLogger("uvicorn.error")
 
 
 def run_app():
@@ -16,7 +15,6 @@ def run_app():
 
 if __name__ == '__main__':
     try:
-        logger.info("Starting web host")
         run_app()
 
     except Exception:

@@ -12,7 +12,7 @@ from tortoise.models import Model
 
 from ..data import RepositoryProtocol, context
 
-logger = logging.getLogger("root")
+logger = logging.getLogger("uvicorn.error")
 
 
 @context(name="product")

@@ -16,7 +16,8 @@ from starlette.types import ASGIApp
 
 from .repository import BaseRepository
 
-logger: logging.Logger = logging.getLogger("root")
+logger: logging.Logger = logging.getLogger("uvicorn.error")
+
 
 class ContextService(NamedTuple):
     name: str

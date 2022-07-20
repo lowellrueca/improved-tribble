@@ -3,7 +3,7 @@ from tortoise import Tortoise
 from tortoise.exceptions import OperationalError
 from starlette.exceptions import HTTPException
 
-logger: logging.Logger = logging.getLogger("root")
+logger: logging.Logger = logging.getLogger("uvicorn.error")
 
 async def on_startup():
     from .settings import DB_URL

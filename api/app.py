@@ -5,7 +5,7 @@ from starlette.applications import Starlette as App
 from starlette.middleware import Middleware
 from starlette.routing import Mount
 
-logger: logging.Logger = logging.getLogger("root")
+logger: logging.Logger = logging.getLogger("uvicorn.error")
 
 
 def create_app():
