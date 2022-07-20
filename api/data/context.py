@@ -55,8 +55,9 @@ def context(name:str):
         async def fn(*args, **kwargs):
             request: Request = args[0]
 
-            # to validate payload on post or on patch endpoints
             try:
+                # retrieves the context service by name
+                # that is registered in the context service middleware
                 context: ContextService = tuple(filter(lambda x: 
                     cast(ContextService, x).name == name, 
                     request.state.contexts))[0]
@@ -64,6 +65,7 @@ def context(name:str):
                 repo: Type[BaseRepository] = context.repository
                 schema: Type[Schema] = context.schema
 
+                # to validate payload on post or on patch endpoints
                 if request.method == "POST" or request.method == "PATCH":
                     payload = await request.json()
                     schema().load(payload)
@@ -72,6 +74,7 @@ def context(name:str):
                     return await f(repository=repo(), schema=schema, data=data, 
                         *args, **kwargs)
 
+                # to inject the repository only in the delete endpoints
                 if request.method == "DELETE":
                     return await f(repository=repo(), *args, **kwargs)
 
@@ -95,6 +98,9 @@ def context(name:str):
                 logger.exception(msg=detail)
                 raise HTTPException(status_code=400, detail=detail)
 
+            # to handle index error if the context name arg not
+            # in the context services names registered in the
+            # context service middlewares
             except IndexError as exc:
                 logger.exception(msg=str(exc))
                 raise HTTPException(
