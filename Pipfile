@@ -8,7 +8,6 @@ uvicorn = "*"
 starlette = "*"
 tortoise-orm = "*"
 asyncpg = "*"
-orjson = "*"
 marshmallow-jsonapi = "*"
 
 [dev-packages]
