@@ -10,17 +10,15 @@ services:
       db:
         condition: service_healthy
     env_file:
-      - ./.env
+      - ./envs/settings.env
   db:
     container_name: pctec_db
     image: postgres:14-alpine
     restart: always
     ports:
       - "5432:5432"
-    environment:
-      - POSTGRES_USER=${DB_USER:-user}
-      - POSTGRES_PASSWORD=${DB_PSWD:-pswd}
-      - POSTGRES_DB=${DB_NAME:-db}
+    env_file:
+      - ./envs/db.env
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
