@@ -86,7 +86,7 @@ async def update_product(
 
     except DoesNotExist as exc:
         logger.exception(exc.args)
-        raise HTTPException(status_code=404, detail="Product does not exist")
+        raise HTTPException(status_code=404, detail="Not found")
 
     return JSONResponse(content=content)
 
@@ -103,7 +103,7 @@ async def delete_product(
     
     except DoesNotExist as exc:
         logger.exception(msg=str(exc))
-        raise HTTPException(status_code=404, detail="Product does not exist")
+        raise HTTPException(status_code=404, detail="Not found")
 
     return Response(status_code=204)
 
