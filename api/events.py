@@ -11,7 +11,6 @@ async def on_startup():
 
     try:
         logger.info("Initializing DB")
-        #await Tortoise.init(config=DB_CONFIG)
         await Tortoise.init(db_url=DB_URL, modules={"models": ["api.db"]})
         await Tortoise.generate_schemas()
         await seed_data()
